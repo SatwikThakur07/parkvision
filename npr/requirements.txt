@@ -1,0 +1,13 @@
+opencv-python==4.12.0.88
+ultralytics==8.3.234
+easyocr==1.7.2
+numpy==2.2.6
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+python-multipart==0.0.9
+pydantic==2.9.2
+pydantic-settings==2.5.2
+pyyaml==6.0.3
+python-json-logger==2.0.7
+aiofiles==24.1.0
+
