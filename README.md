@@ -59,13 +59,13 @@ python3 run_integrated.py
 - **Web Interface**: http://localhost:8000
 - **API Documentation**: http://localhost:8000/docs
 
-### Model File Setup
+### Model Files
 
-**Important**: The license plate detection model (`npr/license_plate_best.pt`) is not included in the repository. You need to:
+✅ **Model files are included in the repository:**
+- `npr/license_plate_best.pt` - License plate detection model
+- `psd1/yolov8n.pt` - Vehicle detection model
 
-1. Obtain the trained YOLO model file for license plate detection
-2. Place it in the `npr/` directory: `npr/license_plate_best.pt`
-3. The file will be automatically mounted when using Docker Compose
+Both models are automatically included when you clone the repository. No additional setup required!
 
 ## 📖 Usage Guide
 

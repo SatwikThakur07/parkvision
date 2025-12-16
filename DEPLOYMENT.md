@@ -16,23 +16,13 @@ git clone https://github.com/SatwikThakur07/parkvision.git
 cd parkvision
 ```
 
-### 2. Model File Setup
+### 2. Model Files
 
-**Important**: The license plate detection model file (`npr/license_plate_best.pt`) is not included in the repository due to size limitations. You need to:
+✅ **Model files are included in the repository:**
+- `npr/license_plate_best.pt` - License plate detection model (5.9MB)
+- `psd1/yolov8n.pt` - Vehicle detection model (6.2MB)
 
-**Option A: If you have the model file locally**
-```bash
-# Place the model file in the npr/ directory
-cp /path/to/your/license_plate_best.pt npr/license_plate_best.pt
-```
-
-**Option B: Download from your source**
-- Contact the repository maintainer for access
-- Or use your own trained YOLO model for license plate detection
-
-**Option C: The model will be mounted from host**
-- The `docker-compose.yml` mounts the model file from your host machine
-- Ensure the file exists at `./npr/license_plate_best.pt` before starting
+These will be automatically included when you clone the repository and build the Docker image. No additional setup required!
 
 ### 3. Build and Run
 
@@ -127,11 +117,11 @@ docker compose up -d
 ### Model file not found
 
 ```bash
-# Verify model file exists
-ls -lh npr/license_plate_best.pt
+# Verify model files exist (they should be in the repository)
+ls -lh npr/license_plate_best.pt psd1/yolov8n.pt
 
-# Check volume mount in docker-compose.yml
-# Ensure the path matches your file location
+# If missing, ensure you've cloned the full repository
+git pull origin main
 ```
 
 ### Port already in use
@@ -185,7 +175,8 @@ docker compose up --build -d
 
 ## 📝 Notes
 
-- The vehicle detection model (`psd1/yolov8n.pt`) downloads automatically on first run
+- Both model files (`npr/license_plate_best.pt` and `psd1/yolov8n.pt`) are included in the repository
+- Models are copied into the Docker image during build
 - All detection logs are stored in `results/` directory
 - Annotations are saved in `uploads/` directory
 - Data persists across container restarts due to volume mounts
