@@ -59,6 +59,10 @@ uploads/*
 *.onnx
 *.weights
 
+# Exception: Include required model files for deployment
+!npr/license_plate_best.pt
+!psd1/yolov8n.pt
+
 # Video files
 *.mp4
 *.avi
