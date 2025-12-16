@@ -19,27 +19,53 @@ A comprehensive parking management system that combines **License Plate Recognit
 
 ## 🛠️ Quick Setup
 
-### 1. Install Dependencies
+### Option 1: Docker Deployment (Recommended)
+
+```bash
+# Clone repository
+git clone https://github.com/SatwikThakur07/parkvision.git
+cd parkvision
+
+# Ensure model file exists (see Model File section below)
+# Then build and run
+docker compose up --build -d
+
+# Access at http://localhost:8001
+```
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed Docker deployment instructions.
+
+### Option 2: Local Python Setup
+
+#### 1. Install Dependencies
 
 ```bash
 pip install -r requirements_integrated.txt
 ```
 
-### 2. Verify Model Files
+#### 2. Verify Model Files
 
-- **License Plate Model**: `npr/license_plate_best.pt` (should already exist)
+- **License Plate Model**: `npr/license_plate_best.pt` (must be provided - not in repo due to size)
 - **Vehicle Detection Model**: `psd1/yolov8n.pt` (downloads automatically on first run)
 
-### 3. Start the Server
+#### 3. Start the Server
 
 ```bash
 python3 run_integrated.py
 ```
 
-### 4. Access the Application
+#### 4. Access the Application
 
 - **Web Interface**: http://localhost:8000
 - **API Documentation**: http://localhost:8000/docs
+
+### Model File Setup
+
+**Important**: The license plate detection model (`npr/license_plate_best.pt`) is not included in the repository. You need to:
+
+1. Obtain the trained YOLO model file for license plate detection
+2. Place it in the `npr/` directory: `npr/license_plate_best.pt`
+3. The file will be automatically mounted when using Docker Compose
 
 ## 📖 Usage Guide
 
@@ -140,6 +166,8 @@ python3 run_integrated.py
 
 ## 📝 Documentation
 
+- [Deployment Guide](DEPLOYMENT.md) - Docker deployment instructions
+- [AWS Deployment Guide](AWS_DEPLOYMENT.md) - Deploy on AWS (EC2, ECS)
 - [Quick Start Guide](HOW_TO_RUN.md) - Detailed setup instructions
 - [API Documentation](http://localhost:8000/docs) - Interactive API docs (when server is running)
 - [NPR Module README](npr/README.md) - License plate detection details
