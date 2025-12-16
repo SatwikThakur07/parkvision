@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     
     # Model config
     yolo_model_path: str = "license_plate_best.pt"
-    confidence_threshold: float = 0.3
+    confidence_threshold: float = 0.5
     gpu_enabled: bool = True
     
     # OCR config

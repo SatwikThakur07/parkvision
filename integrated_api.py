@@ -19,12 +19,31 @@ from pathlib import Path
 import threading
 import sys
 
-# #region agent log
-try:
-    with open('/Users/user/Downloads/npr_and_psd/.cursor/debug.log', 'a') as f:
-        f.write(json.dumps({"sessionId":"debug-session","runId":"pre-fix","hypothesisId":"A","location":"integrated_api.py:22","message":"Before sys.path manipulation","data":{"current_paths":sys.path[:3],"base_dir":str(Path(__file__).parent)},"timestamp":int(datetime.now().timestamp()*1000)}) + '\n')
-except: pass
-# #endregion
+# Debug logging setup (container-safe)
+DEBUG_DIR = Path(__file__).parent / ".cursor"
+DEBUG_DIR.mkdir(parents=True, exist_ok=True)
+DEBUG_LOG = DEBUG_DIR / "debug.log"
+
+def safe_debug(message: str, data: dict | None = None, location: str = "integrated_api"):
+    """Write lightweight debug info; ignore all failures."""
+    if data is None:
+        data = {}
+    try:
+        with open(DEBUG_LOG, "a") as f:
+            f.write(json.dumps({
+                "sessionId": "debug-session",
+                "runId": "pre-fix",
+                "hypothesisId": "A",
+                "location": location,
+                "message": message,
+                "data": data,
+                "timestamp": int(datetime.now().timestamp() * 1000)
+            }) + "\n")
+    except Exception:
+        pass
+
+# Initial debug log
+safe_debug("Before sys.path manipulation", {"current_paths": sys.path[:3], "base_dir": str(Path(__file__).parent)}, "integrated_api.py:22")
 
 # Add both project directories to path
 # FIX: Add 'npr' instead of 'npr/src' so 'src.config' imports resolve correctly
@@ -32,39 +51,20 @@ base_dir = Path(__file__).parent
 npr_path = str(base_dir / "npr")
 psd1_path = str(base_dir / "psd1")
 
-# #region agent log
-try:
-    with open('/Users/user/Downloads/npr_and_psd/.cursor/debug.log', 'a') as f:
-        f.write(json.dumps({"sessionId":"debug-session","runId":"post-fix","hypothesisId":"B","location":"integrated_api.py:30","message":"Path values before insertion (FIXED)","data":{"npr_path":npr_path,"psd1_path":psd1_path,"npr_path_exists":Path(npr_path).exists()},"timestamp":int(datetime.now().timestamp()*1000)}) + '\n')
-except: pass
-# #endregion
+safe_debug("Path values before insertion (FIXED)", {"npr_path": npr_path, "psd1_path": psd1_path, "npr_path_exists": Path(npr_path).exists()}, "integrated_api.py:30")
 
 sys.path.insert(0, npr_path)  # FIX: Changed from npr/src to npr
 sys.path.insert(0, psd1_path)
 
-# #region agent log
-try:
-    with open('/Users/user/Downloads/npr_and_psd/.cursor/debug.log', 'a') as f:
-        f.write(json.dumps({"sessionId":"debug-session","runId":"post-fix","hypothesisId":"B","location":"integrated_api.py:37","message":"After sys.path insertion (FIXED)","data":{"first_3_paths":sys.path[:3]},"timestamp":int(datetime.now().timestamp()*1000)}) + '\n')
-except: pass
-# #endregion
+safe_debug("After sys.path insertion (FIXED)", {"first_3_paths": sys.path[:3]}, "integrated_api.py:37")
 
 # Import NPR modules
 try:
-    # #region agent log
-    with open('/Users/user/Downloads/npr_and_psd/.cursor/debug.log', 'a') as f:
-        f.write(json.dumps({"sessionId":"debug-session","runId":"post-fix","hypothesisId":"A","location":"integrated_api.py:42","message":"Attempting to import plate_processor (FIXED)","data":{},"timestamp":int(datetime.now().timestamp()*1000)}) + '\n')
-    # #endregion
+    safe_debug("Attempting to import plate_processor (FIXED)", {}, "integrated_api.py:42")
     from src.plate_processor import PlateProcessor
-    # #region agent log
-    with open('/Users/user/Downloads/npr_and_psd/.cursor/debug.log', 'a') as f:
-        f.write(json.dumps({"sessionId":"debug-session","runId":"post-fix","hypothesisId":"A","location":"integrated_api.py:45","message":"Successfully imported PlateProcessor","data":{},"timestamp":int(datetime.now().timestamp()*1000)}) + '\n')
-    # #endregion
+    safe_debug("Successfully imported PlateProcessor", {}, "integrated_api.py:45")
 except Exception as e:
-    # #region agent log
-    with open('/Users/user/Downloads/npr_and_psd/.cursor/debug.log', 'a') as f:
-        f.write(json.dumps({"sessionId":"debug-session","runId":"post-fix","hypothesisId":"A","location":"integrated_api.py:49","message":"Failed to import PlateProcessor","data":{"error":str(e),"error_type":type(e).__name__},"timestamp":int(datetime.now().timestamp()*1000)}) + '\n')
-    # #endregion
+    safe_debug("Failed to import PlateProcessor", {"error": str(e), "error_type": type(e).__name__}, "integrated_api.py:49")
     raise
 
 from src.video_processor import VideoProcessor as NPRVideoProcessor

@@ -202,6 +202,173 @@
         .stat-card.entries .stat-value { color: #ffaa00; }
         .stat-card.entries .stat-icon { background: rgba(255, 170, 0, 0.2); color: #ffaa00; }
 
+        /* Occupancy pie card */
+        .pie-card {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .pie-wrapper {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            margin: 0 auto;
+        }
+
+        .pie-chart {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(#ff4444 0%, rgba(0, 255, 136, 0.2) 0%);
+            border: 8px solid #0f1629;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+        }
+
+        .pie-center {
+            position: absolute;
+            inset: 18px;
+            border-radius: 50%;
+            background: #0f1629;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .pie-percent {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ff8888;
+        }
+
+        .pie-label {
+            font-size: 12px;
+            color: #8b8b8b;
+        }
+
+        .pie-legend {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            font-size: 12px;
+            color: #8b8b8b;
+        }
+
+        .pie-legend .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        /* Toggle bar for feeds */
+        .toggle-bar {
+            display: flex;
+            gap: 12px;
+            margin: 16px 0 8px 0;
+        }
+
+        /* Dashboard modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.65);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 300;
+        }
+
+        .modal {
+            background: #0f1629;
+            border: 1px solid #1a2332;
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 1100px;
+            width: 95%;
+            max-height: 90vh;
+            overflow: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .modal-close {
+            background: #1a2332;
+            border: none;
+            color: #8b8b8b;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .modal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 16px;
+        }
+
+        .modal-card {
+            background: #131a2e;
+            border: 1px solid #1a2332;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .modal-card h3 {
+            margin-bottom: 10px;
+            color: white;
+            font-size: 16px;
+        }
+
+        .mini-pie {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            border: 8px solid #0f1629;
+            margin: 0 auto;
+            box-shadow: inset 0 0 18px rgba(0,0,0,0.3);
+        }
+
+        .mini-pie-center {
+            text-align: center;
+            margin-top: -90px;
+            color: #e0e0e0;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .log-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .log-table th, .log-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #1a2332;
+            text-align: left;
+        }
+
+        .log-table th {
+            color: #8b8b8b;
+            font-weight: 600;
+        }
+
         /* Video Feed Section */
         .video-section {
             display: grid;
@@ -661,7 +828,7 @@
                 🔔
                 <span class="notification-badge"></span>
             </button>
-            <button class="icon-btn">⚙️</button>
+            <button class="icon-btn" id="settings-btn" onclick="openDashboard()">⚙️</button>
             <div class="status-indicator">
                 <div class="status-dot"></div>
                 <span>System Online</span>
@@ -703,6 +870,25 @@
                     <div class="stat-icon">🚗</div>
                 </div>
             </div>
+            <div class="stat-card pie-card">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-title">Occupancy Ratio</div>
+                        <div class="stat-subtitle">Share of total spaces</div>
+                    </div>
+                </div>
+                <div class="pie-wrapper">
+                    <div class="pie-chart" id="occupancy-pie"></div>
+                    <div class="pie-center">
+                        <div class="pie-percent" id="occupancy-percent-text">0%</div>
+                        <div class="pie-label">Occupied</div>
+                    </div>
+                </div>
+                <div class="pie-legend">
+                    <span><span class="dot" style="background:#ff4444;"></span>Occupied</span>
+                    <span><span class="dot" style="background:#00ff88;"></span>Available</span>
+                </div>
+            </div>
             <div class="stat-card entries">
                 <div class="stat-header">
                     <div>
@@ -715,10 +901,16 @@
             </div>
         </div>
 
+        <!-- Feed toggles -->
+        <div class="toggle-bar">
+            <button class="btn btn-secondary" id="toggle-gate-btn" onclick="toggleGateFeed()">Show Plate Feed</button>
+            <button class="btn btn-secondary" id="toggle-parking-btn" onclick="toggleParkingFeed()">Show Parking Feed</button>
+        </div>
+
         <!-- Video Feeds -->
         <div class="video-section">
             <!-- Gate Camera (NPR) -->
-            <div class="video-card">
+            <div class="video-card" id="gate-card" style="display: none;">
                 <div class="video-header">
                     <div class="video-title">
                         <h3>Plate Detection</h3>
@@ -741,7 +933,7 @@
             </div>
 
             <!-- Parking Lot Camera (PSD1) -->
-            <div class="video-card">
+            <div class="video-card" id="parking-card" style="display: none;">
                 <div class="video-header">
                     <div class="video-title">
                         <h3>Space Detection</h3>
@@ -802,6 +994,49 @@
                 <div class="plates-footer">
                     <span id="last-update">Last updated: Just now</span>
                     <span>v1.0.0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Modal -->
+    <div class="modal-overlay" id="dashboard-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Analytics Dashboard</div>
+                <button class="modal-close" onclick="closeDashboard()">Close</button>
+            </div>
+            <div class="modal-grid">
+                <div class="modal-card">
+                    <h3>Parking Occupancy (all-time)</h3>
+                    <div class="mini-pie" id="history-occupancy-pie"></div>
+                    <div class="mini-pie-center" id="history-occupancy-text">0%</div>
+                    <div class="pie-legend" style="margin-top:12px;">
+                        <span><span class="dot" style="background:#ff4444;"></span>Occupied events</span>
+                        <span><span class="dot" style="background:#00ff88;"></span>Empty events</span>
+                    </div>
+                </div>
+                <div class="modal-card">
+                    <h3>Unique Plates (all-time)</h3>
+                    <p style="color:#8b8b8b;margin-bottom:8px;">Total unique: <span id="unique-plates-count">0</span></p>
+                    <p style="color:#8b8b8b;margin-bottom:12px;">Total detections: <span id="total-plate-detections">0</span></p>
+                    <div id="top-plates-list" style="max-height:200px;overflow:auto;"></div>
+                </div>
+                <div class="modal-card" style="grid-column: 1 / -1;">
+                    <h3>Per-Space Occupancy Changes</h3>
+                    <div style="overflow:auto; max-height:240px;">
+                        <table class="log-table" id="space-log-table">
+                            <thead>
+                                <tr>
+                                    <th>Space</th>
+                                    <th>Occupied events</th>
+                                    <th>Empty events</th>
+                                    <th>Last state</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1834,8 +2069,171 @@
             if (legendAvailEl) legendAvailEl.textContent = available || 0;
             if (legendOccEl) legendOccEl.textContent = occupied || 0;
             
+            updateOccupancyPie(available || 0, occupied || 0, total || 0);
             // Update grid colors with actual space data
             updateGridColors(available, occupied, spaceStatuses);
+        }
+
+        function updateOccupancyPie(available, occupied, total) {
+            const pie = document.getElementById('occupancy-pie');
+            const percentText = document.getElementById('occupancy-percent-text');
+            if (!pie || !percentText) return;
+
+            const denom = total > 0 ? total : (available + occupied);
+            const occPercent = denom > 0 ? Math.min(100, Math.max(0, (occupied / denom) * 100)) : 0;
+            const availPercent = 100 - occPercent;
+
+            // Conic gradient: occupied first slice, then available
+            pie.style.background = `conic-gradient(#ff4444 ${occPercent}%, rgba(0, 255, 136, 0.2) ${occPercent}% 100%)`;
+            percentText.textContent = `${occPercent.toFixed(1)}%`;
+
+            // Also update legend numbers if present
+            const legendAvailEl = document.getElementById('legend-available');
+            const legendOccEl = document.getElementById('legend-occupied');
+            if (legendAvailEl) legendAvailEl.textContent = available;
+            if (legendOccEl) legendOccEl.textContent = occupied;
+        }
+
+        // Toggle feed visibility
+        function toggleGateFeed() {
+            const card = document.getElementById('gate-card');
+            const btn = document.getElementById('toggle-gate-btn');
+            if (!card || !btn) return;
+            const isHidden = card.style.display === 'none' || card.style.display === '';
+            card.style.display = isHidden ? 'block' : 'none';
+            btn.textContent = isHidden ? 'Hide Plate Feed' : 'Show Plate Feed';
+        }
+
+        function toggleParkingFeed() {
+            const card = document.getElementById('parking-card');
+            const btn = document.getElementById('toggle-parking-btn');
+            if (!card || !btn) return;
+            const isHidden = card.style.display === 'none' || card.style.display === '';
+            card.style.display = isHidden ? 'block' : 'none';
+            btn.textContent = isHidden ? 'Hide Parking Feed' : 'Show Parking Feed';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Ensure feeds start hidden
+            const gateCard = document.getElementById('gate-card');
+            const parkingCard = document.getElementById('parking-card');
+            if (gateCard) gateCard.style.display = 'none';
+            if (parkingCard) parkingCard.style.display = 'none';
+            const gateBtn = document.getElementById('toggle-gate-btn');
+            const parkingBtn = document.getElementById('toggle-parking-btn');
+            if (gateBtn) gateBtn.textContent = 'Show Plate Feed';
+            if (parkingBtn) parkingBtn.textContent = 'Show Parking Feed';
+        });
+
+        async function openDashboard() {
+            const modal = document.getElementById('dashboard-modal');
+            if (!modal) return;
+            modal.style.display = 'flex';
+            await refreshDashboard();
+        }
+
+        function closeDashboard() {
+            const modal = document.getElementById('dashboard-modal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        async function refreshDashboard() {
+            try {
+                const [parkingRes, plateRes] = await Promise.all([
+                    fetch('/api/logs/parking-changes'),
+                    fetch('/api/logs/plate-detections')
+                ]);
+
+                const parkingData = parkingRes.ok ? await parkingRes.json() : { logs: [] };
+                const plateData = plateRes.ok ? await plateRes.json() : { logs: [] };
+
+                renderParkingHistory(parkingData.logs || []);
+                renderPlateHistory(plateData.logs || []);
+            } catch (err) {
+                console.error('Error loading dashboard data', err);
+            }
+        }
+
+        function renderParkingHistory(logs) {
+            let occEvents = 0;
+            let emptyEvents = 0;
+            const perSpace = new Map();
+
+            logs.forEach(row => {
+                const space = row.space_id || row.space || 'unknown';
+                const newState = (row.new_state || row.new_state_change || '').toLowerCase();
+                if (newState.includes('occupied')) occEvents++;
+                else if (newState.includes('empty') || newState.includes('available')) emptyEvents++;
+
+                if (!perSpace.has(space)) perSpace.set(space, { occ: 0, empty: 0, last: newState || '-' });
+                const entry = perSpace.get(space);
+                if (newState.includes('occupied')) entry.occ += 1;
+                if (newState.includes('empty') || newState.includes('available')) entry.empty += 1;
+                entry.last = newState || entry.last;
+            });
+
+            const pie = document.getElementById('history-occupancy-pie');
+            const text = document.getElementById('history-occupancy-text');
+            const denom = Math.max(1, occEvents + emptyEvents);
+            const occPct = Math.min(100, Math.max(0, (occEvents / denom) * 100));
+            if (pie) pie.style.background = `conic-gradient(#ff4444 ${occPct}%, rgba(0, 255, 136, 0.2) ${occPct}% 100%)`;
+            if (text) text.textContent = `${occPct.toFixed(1)}%`;
+
+            const tbody = document.querySelector('#space-log-table tbody');
+            if (tbody) {
+                tbody.innerHTML = '';
+                const entries = Array.from(perSpace.entries()).sort((a,b)=>a[0].localeCompare(b[0]));
+                entries.forEach(([space, data]) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${space}</td>
+                        <td>${data.occ}</td>
+                        <td>${data.empty}</td>
+                        <td>${data.last || '-'}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                if (entries.length === 0) {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td colspan="4" style="color:#8b8b8b;">No parking logs yet</td>`;
+                    tbody.appendChild(tr);
+                }
+            }
+        }
+
+        function renderPlateHistory(logs) {
+            const counts = new Map();
+            logs.forEach(row => {
+                const plate = (row.plate_number || row.plate || '').trim();
+                if (!plate) return;
+                counts.set(plate, (counts.get(plate) || 0) + 1);
+            });
+
+            const totalDetections = Array.from(counts.values()).reduce((a,b)=>a+b,0);
+            const uniquePlates = counts.size;
+
+            const uniqueEl = document.getElementById('unique-plates-count');
+            const totalEl = document.getElementById('total-plate-detections');
+            if (uniqueEl) uniqueEl.textContent = uniquePlates;
+            if (totalEl) totalEl.textContent = totalDetections;
+
+            const list = document.getElementById('top-plates-list');
+            if (list) {
+                list.innerHTML = '';
+                const sorted = Array.from(counts.entries()).sort((a,b)=>b[1]-a[1]).slice(0,20);
+                if (sorted.length === 0) {
+                    list.innerHTML = `<div style="color:#8b8b8b;">No plate logs yet</div>`;
+                } else {
+                    sorted.forEach(([plate, count]) => {
+                        const row = document.createElement('div');
+                        row.style.display = 'flex';
+                        row.style.justifyContent = 'space-between';
+                        row.style.padding = '4px 0';
+                        row.innerHTML = `<span>${plate}</span><span style="color:#8b8b8b;">${count}×</span>`;
+                        list.appendChild(row);
+                    });
+                }
+            }
         }
 
         function updateGridColors(available, occupied, spaceStatuses = {}) {

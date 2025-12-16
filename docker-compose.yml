@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  parkvision:
+    build: .
+    image: parkvision:latest
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./results:/app/results
+      - ./uploads:/app/uploads
+      - ./npr/license_plate_best.pt:/app/npr/license_plate_best.pt
+    environment:
+      PYTHONUNBUFFERED: "1"
+      GPU_ENABLED: "false"
+      OCR_GPU_ENABLED: "false" # remove if CPU-only

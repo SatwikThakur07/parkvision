@@ -1,0 +1,41 @@
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+build/
+dist/
+.eggs/
+
+# Environments
+.venv
+env/
+venv/
+ENV/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# Logs & outputs
+logs/
+*.log
+results/
+outputs/
+output/
+uploads/
+
+# Large assets
+*.pt
+*.pth
+*.onnx
+*.weights
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# Notebooks
+*.ipynb
+.ipynb_checkpoints/

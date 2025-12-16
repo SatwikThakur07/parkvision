@@ -77,6 +77,16 @@ class PlateProcessor:
         if plate_crop.size == 0:
             return ""
         
+        def normalize(txt: str) -> str:
+            return txt.upper().replace(" ", "").strip()
+
+        def clean_and_validate(txt: str) -> str:
+            txt = normalize(txt)
+            candidate = self.correct_plate_format(txt)
+            if candidate and self.plate_pattern.match(candidate):
+                return candidate
+            return ""
+
         try:
             gray = cv2.cvtColor(plate_crop, cv2.COLOR_BGR2GRAY)
             _, thresh = cv2.threshold(
@@ -85,17 +95,25 @@ class PlateProcessor:
             plate_resized = cv2.resize(
                 thresh, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC
             )
-            
-            ocr_result = self.reader.readtext(
+
+            attempts = [
                 plate_resized,
-                detail=0,
-                allowlist="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            )
-            
-            if len(ocr_result) > 0:
-                candidate = self.correct_plate_format(ocr_result[0])
-                if candidate and self.plate_pattern.match(candidate):
-                    return candidate
+                gray,
+                plate_crop,
+                cv2.bitwise_not(plate_resized)
+            ]
+
+            for variant in attempts:
+                ocr_result = self.reader.readtext(
+                    variant,
+                    detail=0,
+                    allowlist="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                )
+                if len(ocr_result) > 0:
+                    for txt in ocr_result:
+                        candidate = clean_and_validate(txt)
+                        if candidate:
+                            return candidate
         
         except Exception as e:
             logger.debug(f"OCR recognition failed: {e}")
@@ -115,7 +133,9 @@ class PlateProcessor:
                     set(self.plate_history[box_id]),
                     key=self.plate_history[box_id].count
                 )
-                self.plate_final[box_id] = most_common
+                # Require at least 1 (single) observation to emit, but prefer stable when available
+                if self.plate_history[box_id].count(most_common) >= 1:
+                    self.plate_final[box_id] = most_common
         return self.plate_final.get(box_id, "")
     
     def detect_plates(self, frame: np.ndarray) -> List[Dict]:
