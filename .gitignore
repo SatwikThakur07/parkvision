@@ -1,32 +1,18 @@
-# Python
+# Python cache and compiled files
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
-.Python
-env/
-venv/
-ENV/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
 *.egg-info/
-.installed.cfg
-*.egg
+build/
+dist/
+.eggs/
 
 # Virtual environments
-.venv
+.venv/
 venv/
 ENV/
+env/
 
 # IDE
 .vscode/
@@ -36,51 +22,46 @@ ENV/
 *~
 .DS_Store
 
-# Logs
+# Runtime data - logs (keep directory structure)
+logs/**/*.log
 *.log
-logs/
 *.log.*
 
-# Output files
-outputs/
-output/
+# Runtime data - outputs (keep directory structure)
+outputs/**/*
+output/**/*
 results/*.csv
 results/*.jsonl
 results/*.json
 !results/.gitkeep
 
-# Uploads
-uploads/*
+# Runtime data - user uploads (keep directory structure)
+uploads/**/*
 !uploads/.gitkeep
 
-# Model files (too large for git)
-*.pt
-*.pth
-*.onnx
-*.weights
+# Test and example data files
+npr/outputs/**/*
+npr/detected_plates.csv
+npr/detected_plates.json
+psd1/easy1_*.csv
+psd1/easy1_*.json
+psd1/easy1.mp4
+psd1/test_frame.jpg
+psd1/spaces.json
+psd1/plots/**/*
 
-# Exception: Include required model files for deployment
-!npr/license_plate_best.pt
-!psd1/yolov8n.pt
-
-# Video files
+# Video files (not needed for deployment)
 *.mp4
 *.avi
 *.mov
 *.mkv
-
-# Data files
-*.csv
-*.jsonl
-*.xlsx
-*.xls
 
 # Temporary files
 *.tmp
 *.temp
 .cache/
 
-# OS
+# OS files
 .DS_Store
 Thumbs.db
 
@@ -101,3 +82,24 @@ htmlcov/
 debug.log
 *.debug
 
+# Binary executables (not needed)
+npr/main
+
+# Duplicate model in root (use psd1/yolov8n.pt)
+yolov8n.pt
+
+# Model files - exclude all except required ones
+*.pt
+*.pth
+*.onnx
+*.weights
+!npr/license_plate_best.pt
+!psd1/yolov8n.pt
+
+# Data files (runtime only)
+*.csv
+*.jsonl
+*.xlsx
+*.xls
+!npr/detected_plates.csv
+!npr/detected_plates.json
